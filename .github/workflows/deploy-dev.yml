@@ -1,0 +1,54 @@
+name: Dev Deploy to Remote Server http://46.101.254.37/
+
+permissions:
+  pull-requests: read
+  deployments: read
+  contents: read
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_dev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.event.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{secrets.DEV_SSH_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 46.101.254.37 >> ~/.ssh/known_hosts
+
+      - name: Deploy and run Docker Compose
+        env:
+          BRANCH: ${{ github.head_ref }}
+          ENV: dev
+          DOMAIN_ADDRESS: "46.101.254.37"
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{env.ENV }}@${{ env.DOMAIN_ADDRESS }} << 'EOF'
+            set -e
+            cd /home/dev/stuba-asos
+            echo "Stopping and removing the containers"
+            docker compose down
+            echo
+            echo "Pulling the latest changes from the repository"
+            echo "${{ env.BRANCH }}"
+            git fetch
+            git checkout "${{ env.BRANCH }}"
+            git pull
+            echo
+            echo "Building and deploying the project"
+            docker compose -f docker-compose-dev.yaml up --build -d
+          EOF
