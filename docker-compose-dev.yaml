@@ -1,5 +1,9 @@
-services:
+x-common-variables: &common-variables
+  POSTGRES_DB: stubasos
+  POSTGRES_USER: admin
+  POSTGRES_PASSWORD: admin
 
+services:
   reverse-proxy:
     image: nginx:latest
     container_name: stuba-asos-proxy
@@ -9,8 +13,10 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - frontend
+      - postgres
     links:
       - frontend
+      - postgres
 
   frontend:
     build: ./frontend/
@@ -18,3 +24,16 @@ services:
     container_name: stuba-asos-frontend
     expose:
       - "8501"
+
+  postgres:
+    image: postgres:17-bookworm
+    container_name: postgres
+    environment: *common-variables
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./initdb/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
