@@ -1,0 +1,19 @@
+services:
+  reverse-proxy:
+  image: nginx:latest
+  container_name: stuba-asos-proxy
+  ports:
+    - 80:8501 # frontend
+  volumes:
+    - ./nginx/nginx-${ENV}.conf:/etc/nginx/nginx.conf
+  depends_on:
+    - frontend
+  links:
+    - frontend
+
+  frontend:
+    build: ./frontend/
+    image: stuba-asos-frontend:latest
+    container_name: stuba-asos-frontend
+    expose:
+      - "8501"
