@@ -32,11 +32,9 @@ jobs:
                 echo "Stopping and removing the containers"
                 docker compose -f docker-compose-dev.yaml down
                 echo
-                echo "Pulling the latest changes from the repository"
-                echo "${{ github.head_ref }}"
-                git fetch
-                git checkout "${{ github.head_ref }}"
-                git pull
+                echo "Switching to main branch and pulling latest changes"
+                git checkout main
+                git pull origin main
                 echo
                 echo "Building and deploying the project"
                 docker compose -f docker-compose-dev.yaml up --build -d
