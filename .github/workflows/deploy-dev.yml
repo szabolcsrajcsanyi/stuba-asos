@@ -21,8 +21,22 @@ jobs:
     steps:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@v1.1.0
+      env:
+        BRANCH: ${{ github.head_ref }}
       with:
             host: ${{ secrets.DEV_HOST }}
             key: ${{ secrets.DEV_SSH_KEY }}
             username: ${{ secrets.DEV_USERNAME }}
-            script: whoami
+            script: |
+                cd /home/${{ secrets.DEV_USERNAME }}/stuba-asos
+                echo "Stopping and removing the containers"
+                docker compose down
+                echo
+                echo "Pulling the latest changes from the repository"
+                echo "${{ env.BRANCH }}"
+                git fetch
+                git checkout "${{ env.BRANCH }}"
+                git pull
+                echo
+                echo "Building and deploying the project"
+                docker compose -f docker-compose-dev.yaml up --build -d
