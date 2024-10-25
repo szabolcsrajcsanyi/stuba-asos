@@ -19,32 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{secrets.DEV_SSH_KEY}}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H 46.101.254.37 >> ~/.ssh/known_hosts
-          echo $pwd
-          echo "${{ secrets.DEV_SSH_KEY }}"
-          cat ~/.ssh/id_ed25519
-
-      - name: Deploy and run Docker Compose
-        env:
-          BRANCH: ${{ github.head_ref }}
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no dev@46.101.254.37 << 'EOF'
-            set -e
-            cd /home/dev/stuba-asos
-            echo "Stopping and removing the containers"
-            docker compose down
-            echo
-            echo "Pulling the latest changes from the repository"
-            echo "${{ env.BRANCH }}"
-            git fetch
-            git checkout "${{ env.BRANCH }}"
-            git pull
-            echo
-            echo "Building and deploying the project"
-            docker compose -f docker-compose-dev.yaml up --build -d
-          EOF
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@v1.1.0
+      with:
+            host: ${{ secrets.HOST }}
+            key: ${{ secrets.PASSWORD }}
+            username: ${{ secrets.USER }}
+            script: whoami
