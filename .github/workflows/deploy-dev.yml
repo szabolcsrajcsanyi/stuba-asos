@@ -16,7 +16,6 @@ on:
 
 jobs:
   deploy_dev:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     concurrency:
