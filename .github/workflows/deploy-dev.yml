@@ -36,7 +36,7 @@ jobs:
           ENV: dev
           DOMAIN_ADDRESS: "46.101.254.37"
         run: |
-          ssh -o StrictHostKeyChecking=no ${{env.ENV }}@${{ env.DOMAIN_ADDRESS }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no dev@46.101.254.37 << 'EOF'
             set -e
             cd /home/dev/stuba-asos
             echo "Stopping and removing the containers"
