@@ -27,7 +27,7 @@ jobs:
           ssh-keyscan -H 46.101.254.37 >> ~/.ssh/known_hosts
           echo $pwd
           echo "${{ secrets.DEV_SSH_KEY }}"
-          echo ~/.ssh/id_ed25519
+          cat ~/.ssh/id_ed25519
 
       - name: Deploy and run Docker Compose
         env:
