@@ -6,7 +6,7 @@ x-common-variables: &common-variables
 services:
   reverse-proxy:
     image: nginx:latest
-    profiles: ["reverse-proxy"]
+    # profiles: ["reverse-proxy"]
     ports:
       - 80:8501 # frontend
     volumes:
