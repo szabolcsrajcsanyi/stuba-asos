@@ -23,10 +23,10 @@ services:
     build: ./frontend/
     image: stuba-asos-frontend:latest
     container_name: stuba-asos-frontend
-    ports:
-      - "8501:8501"
-    # expose:
-      # - "8501"
+    # ports:
+      # - "8501:8501"
+    expose:
+      - "8501"
 
   backend:
     build: ./backend/
@@ -36,10 +36,10 @@ services:
       AUTH_JWT_ALG: HS256
       AUTH_JWT_SECRET: 09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
       DB_URL: postgresql://admin:admin@postgres:5432/stubasos
-    ports:
-      - "8502:8502"
-    # expose:
-      # - "8502"
+    # ports:
+      # - "8502:8502"
+    expose:
+      - "8502"
     depends_on:
       - postgres
     links:
@@ -49,8 +49,10 @@ services:
     image: postgres:17-bookworm
     container_name: postgres
     environment: *common-variables
-    ports:
-      - "5434:5432"
+    expose:
+      - "5432"
+    # ports:
+      # - "5434:5432"
     volumes:
       - ./initdb/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres:/var/lib/postgresql/data
