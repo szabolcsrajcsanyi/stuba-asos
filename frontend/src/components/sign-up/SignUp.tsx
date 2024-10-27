@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -14,6 +15,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
+import AlertDialog from '../alert/AlertDialog';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 
@@ -66,6 +68,9 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
+  const [open, setOpen] = React.useState(false);
+  const [alertText, setAlertText] = React.useState('');
+  const navigate = useNavigate();
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
@@ -104,18 +109,40 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     return isValid;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (nameError || emailError || passwordError) {
       event.preventDefault();
       return;
     }
     const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const payload = {
+      firstname: data.get('name') as string,
+      lastname: data.get('lastName') as string,
+      email: data.get('email') as string,
+      password: data.get('password') as string,
+    };
+
+    try {
+      const response = await fetch('http://backend:5802/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        setOpen(true);
+        setAlertText(responseData.message);
+      } else {
+        navigate('/sign-in');
+      }
+
+    } catch (error) {
+      console.error('There was an error!', error);
+    }
   };
 
   return (
@@ -230,6 +257,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
           </Box>
         </Card>
       </SignUpContainer>
+      <AlertDialog open={open} setOpen={setOpen} alertText={alertText} />
     </AppTheme>
   );
 }

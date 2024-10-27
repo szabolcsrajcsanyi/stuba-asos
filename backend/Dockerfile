@@ -5,7 +5,7 @@ FROM python:3.10.14-slim-bookworm
 WORKDIR /app
 
 # Copy the current directory contents into the container
-COPY /src /app
+COPY ./src /app/src
 COPY requirements.txt /app
 
 # Install any needed packages specified in requirements.txt
@@ -22,11 +22,8 @@ RUN apt-get update && \
 # Set permissions
 RUN chmod -R 755 /app
 
-# Switch to non-root user
-USER appuser
-
 # Make port 8080 available to the world outside this container
-EXPOSE 8080
+EXPOSE 8502
 
 # Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8502"]

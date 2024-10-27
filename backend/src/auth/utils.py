@@ -1,16 +1,11 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
 
 import jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from src.users.service import get_user_by_name
-
-
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from src.users.service import get_user_by_email
+from src.config import settings
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,12 +18,12 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.AUTH_JWT_SECRET, algorithm=settings.AUTH_JWT_ALG)
     return encoded_jwt
 
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user_by_name(db, username)
+def authenticate_user(db: Session, email: str, password: str):
+    user = get_user_by_email(db, email)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):

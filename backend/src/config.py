@@ -2,8 +2,14 @@ from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
-    DATABASE_URL: PostgresDsn
+    AUTH_JWT_ALG: str
+    AUTH_JWT_SECRET: str
+    AUTH_JWT_EXP: int = 5  # minutes
 
-    APP_VERSION: str = "1.0"
+    DB_URL: PostgresDsn
+
+    class Config:
+        env_file = ".env"
+
 
 settings = Config()

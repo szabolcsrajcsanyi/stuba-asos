@@ -1,10 +1,14 @@
-from pydantic_settings import BaseSettings
+# from pydantic_settings import BaseSettings
+# from dotenv import load_dotenv
+# load_dotenv()
+
+# class AuthConfig(BaseSettings):
+#     AUTH_JWT_ALG: str
+#     AUTH_JWT_SECRET: str
+#     AUTH_JWT_EXP: int = 5  # minutes
+
+#     class Config:
+#         env_prefix = "AUTH_"
 
 
-class AuthConfig(BaseSettings):
-    JWT_ALG: str
-    JWT_SECRET: str
-    JWT_EXP: int = 5  # minutes
-
-
-auth_settings = AuthConfig()
+# auth_settings = AuthConfig()

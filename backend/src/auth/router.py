@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from src.auth.schemas import Token
 from src.auth.utils import authenticate_user, create_access_token
-from src.auth.config import auth_settings
+from src.config import settings
 from src.database.db import get_db
 
 
@@ -27,8 +27,8 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=auth_settings.JWT_EXP)
+    access_token_expires = timedelta(minutes=settings.AUTH_JWT_EXP)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")

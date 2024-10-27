@@ -4,25 +4,25 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class RegisterUser(BaseModel):
-    id: Optional[UUID]
+class RequestRegisterUser(BaseModel):
+    id: Optional[UUID] = None
     firstname: str
     lastname: str
     email: str
     password: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class User(BaseModel):
-    id: Optional[UUID]
+    id: Optional[UUID] = None
     firstname: str
     lastname: str
     email: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserInDB(User):
