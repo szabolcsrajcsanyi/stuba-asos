@@ -1,0 +1,19 @@
+-- CREATE TABLE IF NOT EXISTS users (
+--     user_id SERIAL PRIMARY KEY,
+--     firstname VARCHAR(50) NOT NULL,
+--     lastname VARCHAR(50) NOT NULL,
+--     email VARCHAR(255) UNIQUE NOT NULL,
+--     hashed_password TEXT NOT NULL,
+--     created_at TIMESTAMPTZ DEFAULT NOW()
+-- );
+
+-- CREATE TABLE IF NOT EXISTS events (
+--     event_id SERIAL PRIMARY KEY,
+--     name VARCHAR(100) NOT NULL,
+--     type VARCHAR(50) NOT NULL,
+--     price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
+--     location VARCHAR(255) NOT NULL,
+--     description TEXT,
+--     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+--     created_at TIMESTAMPTZ DEFAULT NOW()
+-- );
