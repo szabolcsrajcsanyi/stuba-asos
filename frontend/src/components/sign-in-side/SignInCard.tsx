@@ -71,7 +71,7 @@ export default function SignInCard() {
     }
 
     try {
-      const response = await fetch('http:/46.101.254.37/api/auth/token', {
+      const response = await fetch('http://46.101.254.37/api/auth/token', {
       // const response = await fetch('http://localhost:8502/api/auth/token', {
         method: 'POST',
         body: formData,

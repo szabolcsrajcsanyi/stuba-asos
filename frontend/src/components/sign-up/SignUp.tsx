@@ -129,7 +129,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     }
 
     try {
-      const response = await fetch('http:/46.101.254.37/api/users/register', {
+      const response = await fetch('http://46.101.254.37/api/users/register', {
       // const response = await fetch('http://localhost:8502/api/users/register', {
         method: 'POST',
         headers: {

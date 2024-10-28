@@ -97,7 +97,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     }
 
     try {
-      const response = await fetch('http:/46.101.254.37/api/auth/token', {
+      const response = await fetch('http://46.101.254.37/api/auth/token', {
       // const response = await fetch('http://localhost:8502/api/auth/token', {
         method: 'POST',
         body: formData,
