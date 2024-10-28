@@ -47,7 +47,7 @@ export default function AppAppBar() {
 
   const handleDeleteAccount = async () => {
     try {
-      const response = await fetch('http://backend:8502/api/users/me', {
+      const response = await fetch('http:/46.101.254.37/api/users/me', {
       // const response = await fetch('http://localhost:8502/api/users/me', {
         method: 'DELETE',
         headers: {
