@@ -234,7 +234,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               Don&apos;t have an account?{' '}
               <span>
                 <Link
-                  href="/sign-up"
+                  href="/register"
                   variant="body2"
                   sx={{ alignSelf: 'center' }}
                 >

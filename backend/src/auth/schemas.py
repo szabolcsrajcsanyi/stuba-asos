@@ -7,4 +7,5 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
+    firstname: str | None = None
     email: str | None = None

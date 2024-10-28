@@ -13,6 +13,7 @@ import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Sitemark from './SitemarkIcon';
+import AlertDialog from '../alert/AlertDialog';
 import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
 import { getUserDataFromToken } from '../utils';
 
@@ -34,6 +35,8 @@ const StyledToolbar = styled(Toolbar)(({ theme }: { theme: Theme & { vars?: any 
 
 export default function AppAppBar() {
   const [open, setOpen] = React.useState(false);
+  const [openToggled, setOpenedToggled] = React.useState(false);
+  const [alertText, setAlertText] = React.useState('');
   const userData = getUserDataFromToken();
   const navigate = useNavigate();
 
@@ -42,8 +45,34 @@ export default function AppAppBar() {
     navigate('/');
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      // const response = await fetch('http://backend:8502/api/users/me', {
+      const response = await fetch('http://localhost:8502/api/users/me', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Optional: Add token if authentication is required
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        setOpen(true);
+        setAlertText(responseData.detail);
+      } else {
+        localStorage.removeItem('token');
+        navigate('/login');
+      }
+
+    } catch (error) {
+      console.error('There was an error!', error);
+    }
+  };
+
   const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
+    setOpenedToggled(newOpen);
   };
 
   return (
@@ -82,13 +111,13 @@ export default function AppAppBar() {
           >
             {userData && (
               <Box sx={{ mr: 2 }}>
-                <span>Welcome, {userData.name}!</span>
+                <span>Welcome, {userData.firstname}!</span>
               </Box>
             )}
             <Button color="primary" variant="text" size="small" onClick={handleLogout}>
               Log out
             </Button>
-            <Button color="primary" variant="contained" size="small">
+            <Button color="primary" variant="contained" size="small" onClick={handleDeleteAccount}>
               Delete account
             </Button>
             <ColorModeIconDropdown />
@@ -100,7 +129,7 @@ export default function AppAppBar() {
             </IconButton>
             <Drawer
               anchor="top"
-              open={open}
+              open={openToggled}
               onClose={toggleDrawer(false)}
               PaperProps={{
                 sx: {
@@ -124,12 +153,12 @@ export default function AppAppBar() {
                 <MenuItem>My tickets</MenuItem>
                 <Divider sx={{ my: 3 }} />
                 <MenuItem>
-                  <Button color="primary" variant="contained" fullWidth>
+                  <Button color="primary" variant="contained" fullWidth onClick={handleLogout}>
                     Log out
                   </Button>
                 </MenuItem>
                 <MenuItem>
-                  <Button color="error" variant="outlined" fullWidth>
+                  <Button color="error" variant="outlined" fullWidth onClick={handleDeleteAccount}>
                     Delete account
                   </Button>
                 </MenuItem>
@@ -138,6 +167,7 @@ export default function AppAppBar() {
           </Box>
         </StyledToolbar>
       </Container>
+      <AlertDialog open={open} setOpen={setOpen} alertText={alertText} />
     </AppBar>
   );
 }

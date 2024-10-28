@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, String, TIMESTAMP
+from sqlalchemy import Column, String, TIMESTAMP, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -14,6 +14,7 @@ class Users(Base):
     lastname = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
+    disabled = Column(Boolean, default=False)
     createdAt = Column(TIMESTAMP(timezone=True),
                        nullable=False, server_default=func.now())
     updatedAt = Column(TIMESTAMP(timezone=True),

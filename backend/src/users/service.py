@@ -45,7 +45,20 @@ def user_create(db: Session, request_user: RequestRegisterUser):
         id=db_user.id,
         firstname=db_user.firstname,
         lastname=db_user.lastname,
-        email=db_user.email
+        email=db_user.email,
+        disabled=db_user.disabled
+    )
+
+
+def user_delete(db: Session, current_user: User):
+    user = db.query(Users).filter(Users.id == current_user.id).first()
+    if user:
+        db.delete(user)
+        db.commit()
+        return "User deleted successfully"
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User not found"
     )
 
 
@@ -57,6 +70,7 @@ def get_user_by_email(db: Session, email: str):
             firstname=user.firstname,
             lastname=user.lastname,
             email=user.email,
+            disabled=user.disabled,
             hashed_password=user.password_hash
         )
     return None

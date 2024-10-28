@@ -20,6 +20,7 @@ class User(BaseModel):
     firstname: str
     lastname: str
     email: str
+    disabled: bool
 
     class Config:
         from_attributes = True
