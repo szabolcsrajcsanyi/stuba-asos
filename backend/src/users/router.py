@@ -17,5 +17,5 @@ def get_all_users(db: Session = Depends(get_db)):
     return users_get_all(db=db)
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=User)
-def create_user(post: RequestRegisterUser, db: Session = Depends(get_db)):
-    return user_create(db=db, post=post)
+def create_user(request_user: RequestRegisterUser, db: Session = Depends(get_db)):
+    return user_create(db=db, request_user=request_user)
