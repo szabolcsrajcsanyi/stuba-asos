@@ -232,7 +232,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
               Already have an account?{' '}
               <span>
                 <Link
-                  href="/sign-in/"
+                  href="/login/"
                   variant="body2"
                   sx={{ alignSelf: 'center' }}
                 >
