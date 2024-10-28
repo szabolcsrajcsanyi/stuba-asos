@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -16,6 +17,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
 import AppTheme from '../shared-theme/AppTheme';
+import AlertDialog from '../alert/AlertDialog';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -66,25 +68,55 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [forgotPassOpen, setForgotPassOpen] = React.useState(false);
+  const [alertText, setAlertText] = React.useState('');
+  const navigate = useNavigate();
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setForgotPassOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setForgotPassOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const username = data.get('email') as string | null;
+    const password = data.get('password') as string | null;
+
+    const formData = new FormData();
+    if (username) formData.append('username', username);
+    if (password) formData.append('password', password);
+
     if (emailError || passwordError) {
-      event.preventDefault();
+      setAlertText('Validation failed');
+      setOpen(true);
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+
+    try {
+      // const response = await fetch('http://backend:8502/api/auth/token', {
+      const response = await fetch('http://localhost:8502/api/auth/token', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.log(responseData.detail);
+        setOpen(true);
+        setAlertText(responseData.detail);
+      } else {
+        localStorage.setItem('token', responseData.access_token);
+        navigate('/tickets');
+      }
+
+    } catch (error) {
+      console.error('There was an error!', error);
+    }
   };
 
   const validateInputs = () => {
@@ -189,7 +221,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <ForgotPassword open={open} handleClose={handleClose} />
+            <ForgotPassword open={forgotPassOpen} handleClose={handleClose} />
             <Button
               type="submit"
               fullWidth
@@ -232,6 +264,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
           </Box>
         </Card>
       </SignInContainer>
+      <AlertDialog open={open} setOpen={setOpen} alertText={alertText} />
     </AppTheme>
   );
 }

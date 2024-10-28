@@ -110,20 +110,27 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
+    event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const fullName = data.get('name') as string;
+    const [firstname, lastname] = fullName.split(' ');
+
     const payload = {
-      firstname: data.get('name') as string,
-      lastname: data.get('lastName') as string,
+      firstname: firstname || '',  // Handle cases where there's no split
+      lastname: lastname || '',    // Default to an empty string if only one name is provided
       email: data.get('email') as string,
       password: data.get('password') as string,
     };
 
+    if (nameError || emailError || passwordError) {
+      setAlertText('Validation failed');
+      setOpen(true);
+      return;
+    }
+
     try {
-      const response = await fetch('http://backend:5802/api/register', {
+      // const response = await fetch('http://backend:8502/api/users/register', {
+      const response = await fetch('http://localhost:8502/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,9 +142,9 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
 
       if (!response.ok) {
         setOpen(true);
-        setAlertText(responseData.message);
+        setAlertText(responseData.detail);
       } else {
-        navigate('/sign-in');
+        navigate('/login');
       }
 
     } catch (error) {

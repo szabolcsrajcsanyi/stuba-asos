@@ -10,6 +10,9 @@ import {
 import SignInSide from './components/sign-in-side/SignInSide';
 import SignUp from './components/sign-up/SignUp';
 import SignIn from './components/sign-in/SignIn';
+import Tickets from './components/events/Tickets';
+import PublicRoute from './components/route-priviliges/PublicRoute';
+import ProtectedRoute from './components/route-priviliges/ProtectedRoute';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -17,9 +20,10 @@ const root = ReactDOM.createRoot(
 root.render(
   <Router>
     <Routes>
-      <Route path="/" element={<SignInSide />} />
-      <Route path="sign-up" element={<SignUp />} />
-      <Route path="sign-in" element={<SignIn />} />
+      <Route path="/" element={<PublicRoute><SignInSide /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><SignUp /></PublicRoute>} />
+      <Route path="/login" element={<PublicRoute><SignIn /></PublicRoute>} />
+      <Route path="/tickets" element={<ProtectedRoute><Tickets /></ProtectedRoute>} />
     </Routes>
   </Router>
 );
