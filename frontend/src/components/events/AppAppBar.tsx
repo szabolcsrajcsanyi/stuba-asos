@@ -47,8 +47,8 @@ export default function AppAppBar() {
 
   const handleDeleteAccount = async () => {
     try {
-      // const response = await fetch('http://backend:8502/api/users/me', {
-      const response = await fetch('http://localhost:8502/api/users/me', {
+      const response = await fetch('http://backend:8502/api/users/me', {
+      // const response = await fetch('http://localhost:8502/api/users/me', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Optional: Add token if authentication is required

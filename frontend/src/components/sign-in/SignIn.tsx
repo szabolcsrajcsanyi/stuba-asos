@@ -97,8 +97,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     }
 
     try {
-      // const response = await fetch('http://backend:8502/api/auth/token', {
-      const response = await fetch('http://localhost:8502/api/auth/token', {
+      const response = await fetch('http://backend:8502/api/auth/token', {
+      // const response = await fetch('http://localhost:8502/api/auth/token', {
         method: 'POST',
         body: formData,
       });
