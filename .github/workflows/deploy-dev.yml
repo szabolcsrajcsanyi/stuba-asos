@@ -42,8 +42,8 @@ jobs:
                 echo
                 echo "DEV setup"
                 echo "env: ${{env.ENV}}"
-                echo "ENV=${{env.ENV}}" > .env
-                echo "BACKEND_URL=${{ secrets.DEV_HOST }}" >> .env
+                echo "REACT_APP_ENV=${{env.ENV}}" > ./frontend/.env.local
+                echo "REACT_APP_BACKEND_URL=${{ secrets.DEV_HOST }}" >> ./frontend/.env.local
                 ls -l .env
                 echo
                 echo "Building and deploying the project"
