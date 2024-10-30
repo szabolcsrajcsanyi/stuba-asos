@@ -20,10 +20,6 @@ services:
   frontend:
     build: ./frontend/
     image: stuba-asos-frontend:latest
-    env_file:
-      - .env
-    environment:
-      BACKEND_URL: ${BACKEND_URL}
     expose:
       - "8501"
 
