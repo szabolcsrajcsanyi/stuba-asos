@@ -5,6 +5,7 @@ WORKDIR /app
 COPY src ./src
 COPY public ./public
 
+COPY .env.local ./
 COPY package.json package-lock.json ./
 COPY tsconfig.json ./
 
