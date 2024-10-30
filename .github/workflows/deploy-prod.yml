@@ -1,4 +1,4 @@
-name: Dev Deploy to Remote Server http://46.101.254.37/
+name: Prod Deploy to Remote Server http://http://209.38.198.174//
 
 permissions:
   pull-requests: read
@@ -19,10 +19,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: executing remote ssh commands using password
+    - name: executing remote ssh commands using ssh key
       uses: appleboy/ssh-action@v1.1.0
       env:
         BRANCH: ${{ github.head_ref }}
+        ENV: prod
       with:
             host: ${{ secrets.PROD_HOST }}
             key: ${{ secrets.PROD_SSH_KEY }}
@@ -30,11 +31,17 @@ jobs:
             script: |
                 cd /home/${{ secrets.PROD_USERNAME }}/stuba-asos
                 echo "Stopping and removing the containers"
-                docker compose -f docker-compose.yaml down
+                docker compose -f docker-compose-deploy.yaml down
                 echo
                 echo "Switching to main branch and pulling latest changes"
                 git checkout main
                 git pull origin main
                 echo
+                echo "PROD setup"
+                echo "env: ${{env.ENV}}"
+                echo "ENV=${{env.ENV}}" > .env
+                echo "BACKEND_URL=${{ secrets.PROD_HOST }}" >> .env
+                ls -l .env
+                echp
                 echo "Building and deploying the project"
-                docker compose -f docker-compose.yaml up --build -d
+                docker compose -f docker-compose-deploy.yaml up --build -d

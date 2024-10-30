@@ -71,8 +71,8 @@ export default function SignInCard() {
     }
 
     try {
-      const response = await fetch('http://46.101.254.37/api/auth/token', {
-      // const response = await fetch('http://localhost:8502/api/auth/token', {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
+      const response = await fetch(`http://${backendUrl}/api/auth/token`, {
         method: 'POST',
         body: formData,
       });
