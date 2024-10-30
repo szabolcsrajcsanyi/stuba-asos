@@ -7,7 +7,6 @@ permissions:
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
     branches:
       - main
   push:
@@ -15,8 +14,8 @@ on:
       - main
 
 jobs:
-  deploy_dev:
-    if: github.event_name == 'pull_request'
+  deploy_prod:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -25,20 +24,17 @@ jobs:
       env:
         BRANCH: ${{ github.head_ref }}
       with:
-            host: ${{ secrets.DEV_HOST }}
-            key: ${{ secrets.DEV_SSH_KEY }}
-            username: ${{ secrets.DEV_USERNAME }}
+            host: ${{ secrets.PROD_HOST }}
+            key: ${{ secrets.PROD_SSH_KEY }}
+            username: ${{ secrets.PROD_USERNAME }}
             script: |
-                cd /home/${{ secrets.DEV_USERNAME }}/stuba-asos
+                cd /home/${{ secrets.PROD_USERNAME }}/stuba-asos
                 echo "Stopping and removing the containers"
                 docker compose -f docker-compose.yaml down
                 echo
-                echo "Pulling the latest changes from the repository"
-                echo "${{ env.BRANCH }}"
-                git fetch
-                git checkout "${{ env.BRANCH }}"
-                git pull
-                echo
+                echo "Switching to main branch and pulling latest changes"
+                git checkout main
+                git pull origin main
                 echo
                 echo "Building and deploying the project"
                 docker compose -f docker-compose.yaml up --build -d

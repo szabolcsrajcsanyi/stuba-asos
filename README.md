@@ -2,9 +2,13 @@
 
 This project is part of a school subject and focuses on creating a platform for buying and selling tickets. 
 
-## Project Overview
+## Development Environment
 
-The website is accessible at [http://46.101.254.37](http://46.101.254.37). For detailed API documentation, visit [http://46.101.254.37/api/docs](http://46.101.254.37/api/docs).
+The development environment is hosted on [http://46.101.254.37](http://46.101.254.37). For detailed API documentation in the development environment, visit [http://46.101.254.37/api/docs](http://46.101.254.37/api/docs).
+
+## Production Environment
+
+The production environment is hosted on [http://209.38.198.174](http://209.38.198.174). For detailed API documentation in the production environment, visit [http://209.38.198.174/api/docs](http://209.38.198.174/api/docs).
 
 ## Contributing
 
