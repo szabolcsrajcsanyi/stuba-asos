@@ -12,10 +12,8 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - frontend
       - postgres
     links:
-      - frontend
       - postgres
 
   # frontend:
