@@ -1,39 +1,37 @@
-import uuid
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, DateTime
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import Column, String, TIMESTAMP, Boolean
-from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import UUID
+Base = declarative_base()
 
-from src.database.db import Base, engine
-
-class Users(Base):
+class User(Base):
     __tablename__ = 'users'
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    firstname = Column(String, nullable=False)
-    lastname = Column(String, nullable=False)
-    email = Column(String, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     disabled = Column(Boolean, default=False)
-    createdAt = Column(TIMESTAMP(timezone=True),
-                       nullable=False, server_default=func.now())
-    updatedAt = Column(TIMESTAMP(timezone=True),
-                       default=None, onupdate=func.now())
-    
 
-# class Events(Base):
-#     __tablename__ = 'events'
+    # Relationships
+    tickets_selling = relationship('Ticket', back_populates='seller', foreign_keys='Ticket.seller_id')
+    tickets_buying = relationship('Ticket', back_populates='buyer', foreign_keys='Ticket.buyer_id')
 
-#     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-#     name = Column(String, nullable=False)
-#     title = Column(String, nullable=False)
-#     description = Column(String, nullable=False)
-#     location = Column(String, nullable=False)
-#     date = Column(TIMESTAMP(timezone=True), nullable=False)
-#     createdAt = Column(TIMESTAMP(timezone=True),
-#                        nullable=False, server_default=func.now())
-#     updatedAt = Column(TIMESTAMP(timezone=True),
-#                        default=None, onupdate=func.now())
+class Ticket(Base):
+    __tablename__ = 'ticket'
 
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    date = Column(DateTime, nullable=False)
+    category = Column(String, nullable=False)
+    price = Column(Float, nullable=False)
 
-Base.metadata.create_all(engine)
+    # Foreign Keys
+    buyer_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    seller_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+    # Relationships
+    buyer = relationship('User', back_populates='tickets_buying', foreign_keys=[buyer_id])
+    seller = relationship('User', back_populates='tickets_selling', foreign_keys=[seller_id])
