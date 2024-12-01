@@ -33,3 +33,7 @@ def delete_user(
     db: Session = Depends(get_db),
 ):
     return user_delete(db=db, current_user=current_user)
+
+@router.post("/buyticket", status_code=status.HTTP_200_OK, response_model=List[User])
+def buy_ticket(db: Session = Depends(get_db)):
+     pass

@@ -16,6 +16,10 @@ import { styled } from '@mui/material/styles';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import RssFeedRoundedIcon from '@mui/icons-material/RssFeedRounded';
 import Button from "@mui/material/Button";
+import {useState} from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
 
 const cardData = [
   {
@@ -110,6 +114,11 @@ const StyledTypography = styled(Typography)({
   textOverflow: 'ellipsis',
 });
 
+const StyledDialogActions = styled(DialogActions)({
+    display: "flex",
+    justifyContent: "center",
+})
+
 function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
   return (
     <Box
@@ -169,6 +178,8 @@ export default function MainContent() {
   const [focusedCardIndex, setFocusedCardIndex] = React.useState<number | null>(
     null,
   );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
 
   const handleFocus = (index: number) => {
     setFocusedCardIndex(index);
@@ -181,9 +192,41 @@ export default function MainContent() {
   const handleClick = () => {
     console.info('You clicked the filter chip.');
   };
-    const handleBuyClick = (ticketId:string) => {
-    console.log(`Buying ticket with ID: ${ticketId}`);
-    // Add actual buy logic here
+  const handleBuyClick = async (ticketId:string) => {
+    console.log(`Confirming to buy ticket`);
+    setSelectedTicketId(ticketId);
+    setIsDialogOpen(true);
+  };
+  const handleDialogClose = async (confirm: boolean) => {
+    if (confirm && selectedTicketId) {
+      console.log(`Buying ticket with ID: ${selectedTicketId}`);
+      // Call your ticket purchase function here
+      // purchaseTicket(selectedTicketId);
+      const payload = {
+        ticketId: selectedTicketId || ''
+      };
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
+      try {
+        const response = await fetch(`http://${backendUrl}/api/users/buyticket`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        const responseData = await response.json();
+        if (!response.ok) {
+          console.log()
+        }
+        return;
+      }
+      catch (error) {
+        console.error('There was an error!', error);
+      }
+    }
+    setIsDialogOpen(false);
+    setSelectedTicketId(null);
+
   };
 
   return (
@@ -280,6 +323,25 @@ export default function MainContent() {
           </IconButton>
         </Box>
       </Box>
+     {/* Purchase confirmation */}
+     <Dialog
+        open={isDialogOpen}
+        onClose={() => handleDialogClose(false)}
+        aria-labelledby="confirmation-dialog-title"
+      >
+        <DialogTitle id="confirmation-dialog-title">
+          Do you want to buy this ticket?
+        </DialogTitle>
+        <StyledDialogActions>
+          <Button onClick={() => handleDialogClose(true)} color="primary" autoFocus>
+            Yes
+          </Button>
+          <Button onClick={() => handleDialogClose(false)} color="secondary">
+            No
+          </Button>
+        </StyledDialogActions>
+      </Dialog>
+
       <Grid container spacing={2} columns={12}>
         <Grid size={{ xs: 12, md: 6 }}>
           <SyledCard
