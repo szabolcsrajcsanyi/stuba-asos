@@ -21,7 +21,7 @@ services:
     build: ./frontend/
     image: stuba-asos-frontend:latest
     expose:
-      - "8501"
+      - "3000"
 
   backend:
     build: ./backend/
