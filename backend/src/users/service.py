@@ -3,12 +3,12 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from src.database.models import Users
+from src.database.models import User
 from src.users.schemas import RequestRegisterUser, UserInDB, User
 
 
 def users_get_all(db: Session):
-    return db.query(Users).all()
+    return db.query(User).all()
 
 
 def user_create(db: Session, request_user: RequestRegisterUser):
@@ -23,7 +23,7 @@ def user_create(db: Session, request_user: RequestRegisterUser):
             detail="Email is already registered"
         )
 
-    db_user = Users(
+    db_user = User(
         firstname=request_user.firstname, 
         lastname=request_user.lastname, 
         email=request_user.email, 
@@ -51,7 +51,7 @@ def user_create(db: Session, request_user: RequestRegisterUser):
 
 
 def user_delete(db: Session, current_user: User):
-    user = db.query(Users).filter(Users.id == current_user.id).first()
+    user = db.query(User).filter(User.id == current_user.id).first()
     if user:
         db.delete(user)
         db.commit()
@@ -63,7 +63,7 @@ def user_delete(db: Session, current_user: User):
 
 
 def get_user_by_email(db: Session, email: str):
-    user = db.query(Users).filter(Users.email == email).first()
+    user = db.query(User).filter(User.email == email).first()
     if user:
         return UserInDB(
             id=user.id,
