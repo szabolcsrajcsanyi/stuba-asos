@@ -11,6 +11,7 @@ import SignInSide from './components/sign-in-side/SignInSide';
 import SignUp from './components/sign-up/SignUp';
 import SignIn from './components/sign-in/SignIn';
 import Tickets from './components/events/Tickets';
+import TicketsSell from './components/tickets/sell/TicketsSell';
 import PublicRoute from './components/route-priviliges/PublicRoute';
 import ProtectedRoute from './components/route-priviliges/ProtectedRoute';
 
@@ -24,6 +25,7 @@ root.render(
       <Route path="/register" element={<PublicRoute><SignUp /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><SignIn /></PublicRoute>} />
       <Route path="/tickets" element={<ProtectedRoute><Tickets /></ProtectedRoute>} />
+      <Route path='/tickets/sell' element={<ProtectedRoute><TicketsSell/></ProtectedRoute>} />
     </Routes>
   </Router>
 );
