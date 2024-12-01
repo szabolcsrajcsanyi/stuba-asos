@@ -15,14 +15,14 @@ class RequestSellTicket(BaseModel):
         from_attributes = True
 
 class TicketResponse(BaseModel):
-    id: int
+    id: Optional[UUID] = None
     name: str
     description: Optional[str] = None
     date: datetime
     category: str
     price: float
-    seller_id: int
-    buyer_id: Optional[int] = None
+    seller_id: UUID
+    buyer_id: Optional[UUID] = None
     
     class Config:
         from_attributes = True
