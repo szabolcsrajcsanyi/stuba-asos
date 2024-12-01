@@ -21,8 +21,8 @@ class TicketResponse(BaseModel):
     date: datetime
     category: str
     price: float
-    seller_id: UUID
-    buyer_id: Optional[UUID] = None
+    seller_id: int
+    buyer_id: Optional[int] = None
     
     class Config:
         from_attributes = True
