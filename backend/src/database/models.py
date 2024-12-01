@@ -1,10 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+from src.database.db import Base, engine
 
-Base = declarative_base()
-
-class User(Base):
+class Users(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -17,6 +15,7 @@ class User(Base):
     # Relationships
     tickets_selling = relationship('Ticket', back_populates='seller', foreign_keys='Ticket.seller_id')
     tickets_buying = relationship('Ticket', back_populates='buyer', foreign_keys='Ticket.buyer_id')
+
 
 class Ticket(Base):
     __tablename__ = 'ticket'
@@ -33,5 +32,7 @@ class Ticket(Base):
     seller_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     # Relationships
-    buyer = relationship('User', back_populates='tickets_buying', foreign_keys=[buyer_id])
-    seller = relationship('User', back_populates='tickets_selling', foreign_keys=[seller_id])
+    buyer = relationship('Users', back_populates='tickets_buying', foreign_keys=[buyer_id])
+    seller = relationship('Users', back_populates='tickets_selling', foreign_keys=[seller_id])
+
+Base.metadata.create_all(engine)

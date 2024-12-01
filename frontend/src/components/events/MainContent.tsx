@@ -15,6 +15,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import RssFeedRoundedIcon from '@mui/icons-material/RssFeedRounded';
+import Button from "@mui/material/Button";
 
 const cardData = [
   {
@@ -180,6 +181,10 @@ export default function MainContent() {
   const handleClick = () => {
     console.info('You clicked the filter chip.');
   };
+    const handleBuyClick = (ticketId:string) => {
+    console.log(`Buying ticket with ID: ${ticketId}`);
+    // Add actual buy logic here
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -305,6 +310,14 @@ export default function MainContent() {
                 {cardData[0].description}
               </StyledTypography>
             </SyledCardContent>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleBuyClick(cardData[0].title)}
+            >
+              Buy ticket test button
+            </Button>
+
             <Author authors={cardData[0].authors} />
           </SyledCard>
         </Grid>
