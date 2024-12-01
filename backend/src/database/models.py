@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import Column, String, Float, ForeignKey, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -6,7 +8,7 @@ from src.database.db import Base, engine
 class Users(Base):
     __tablename__ = 'users'
 
-    id = Column(UUID, primary_key=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
@@ -21,7 +23,7 @@ class Users(Base):
 class Ticket(Base):
     __tablename__ = 'ticket'
 
-    id = Column(UUID, primary_key=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String, nullable=False)
     description = Column(String)
     date = Column(DateTime, nullable=False)
