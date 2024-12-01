@@ -179,7 +179,7 @@ export default function MainContent() {
     null,
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
   const handleFocus = (index: number) => {
     setFocusedCardIndex(index);
@@ -194,7 +194,7 @@ export default function MainContent() {
   };
   const handleBuyClick = async (ticketId:string) => {
     console.log(`Confirming to buy ticket`);
-    setSelectedTicketId(ticketId);
+    setSelectedTicketId(1);
     setIsDialogOpen(true);
   };
   const handleDialogClose = async (confirm: boolean) => {
@@ -203,20 +203,21 @@ export default function MainContent() {
       // Call your ticket purchase function here
       // purchaseTicket(selectedTicketId);
       const payload = {
-        ticketId: selectedTicketId || ''
+        id: selectedTicketId || ''
       };
       const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
       try {
         const response = await fetch(`http://${backendUrl}/api/users/buyticket`, {
           method: 'POST',
           headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
         });
         const responseData = await response.json();
         if (!response.ok) {
-          console.log()
+          console.log(responseData)
         }
         return;
       }
