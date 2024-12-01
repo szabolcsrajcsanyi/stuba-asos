@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from src.auth import router as auth_router
 from src.users import router as users_router
 from src.status import router as status_router
+from src.tickets import router as ticket_router
 
 
 load_dotenv()
@@ -33,6 +34,7 @@ api_router = APIRouter(prefix="/api")
 api_router.include_router(status_router.router)
 api_router.include_router(auth_router.router)
 api_router.include_router(users_router.router)
+api_router.include_router(ticket_router.router)
 app.include_router(api_router)
 # app.add_middleware(
 #     CORSMiddleware,
