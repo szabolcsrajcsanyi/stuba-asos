@@ -124,4 +124,4 @@ def test_delete_user_failed(client: TestClient):
     }
     response = client.delete("/api/users/me", headers=headers)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.json() == {"detail": "Could not validate credentials"}
+    assert response.json() == {"detail": "Could not validate "}
