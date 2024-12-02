@@ -68,8 +68,8 @@ def get_user_by_email(db: Session, email: str):
     if user:
         return UserInDB(
             id=user.id,
-            firstname=user.first_name,
-            lastname=user.last_name,
+            firstname=user.firstname,
+            lastname=user.lastname,
             email=user.email,
             disabled=user.disabled,
             hashed_password=user.password_hash
