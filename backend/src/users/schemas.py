@@ -16,7 +16,7 @@ class RequestRegisterUser(BaseModel):
 
 
 class User(BaseModel):
-    id: Optional[int] = None
+    id: Optional[UUID] = None
     firstname: str
     lastname: str
     email: str
