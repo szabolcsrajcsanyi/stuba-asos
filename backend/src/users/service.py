@@ -44,8 +44,8 @@ def user_create(db: Session, request_user: RequestRegisterUser):
 
     return User(
         id=db_user.id,
-        firstname=db_user.first_name,
-        lastname=db_user.last_name,
+        firstname=db_user.firstname,
+        lastname=db_user.lastname,
         email=db_user.email,
         disabled=db_user.disabled
     )
