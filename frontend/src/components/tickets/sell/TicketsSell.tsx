@@ -11,6 +11,9 @@ import {
   InputLabel,
   FormControl,
   FormHelperText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -27,6 +30,7 @@ export default function SellTicketForm(props: {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState<number | string>("");
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -51,13 +55,13 @@ export default function SellTicketForm(props: {
     };
     console.log(ticketData);
     try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'localhost:8502';
-        // const backendUrl = 'localhost:8080';
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
+      // const backendUrl = 'localhost:8080';
       const response = await fetch(`http://${backendUrl}/api/tickets/sell`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(ticketData),
       });
@@ -67,10 +71,11 @@ export default function SellTicketForm(props: {
         console.log(responseData.detail);
         setError(responseData.detail);
       } else {
-        navigate("/tickets");
+        setSuccess(true);
+        setTimeout(() => navigate("/tickets"), 4000);
       }
     } catch (error) {
-        console.error('Error occurred calling backend!', error);
+      console.error("Error occurred calling backend!", error);
     }
   };
 
@@ -144,6 +149,16 @@ export default function SellTicketForm(props: {
             Submit
           </Button>
         </form>
+
+        {/* Success Modal */}
+        <Dialog open={success} onClose={() => setSuccess(false)}>
+          <DialogTitle>Success</DialogTitle>
+          <DialogContent>
+            <p>Your ticket has been successfully created!</p>
+            <p>You will be redirected to the homepage shortly.</p>
+          </DialogContent>
+        </Dialog>
+        
       </Container>
     </AppTheme>
   );
