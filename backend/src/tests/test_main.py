@@ -125,3 +125,79 @@ def test_delete_user_failed(client: TestClient):
     response = client.delete("/api/users/me", headers=headers)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json() == {"detail": "Could not validate credentials"}
+
+def test_valid_ticket_sell(client: TestClient):
+    # Step 1: Register a seller
+    seller = {
+        "firstname": "James",
+        "lastname": "Sullivan",
+        "email": "james@sullivan.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=seller)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Step 2: Log in as the seller to get a token
+    data = {
+        "grant_type": "password",
+        "username": "james@sullivan.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token = response.json()["access_token"]
+
+    # Step 3: Create a valid ticket
+    ticket = {
+        "name": "Concert Ticket",
+        "description": "VIP Access to the concert",
+        "date": "2024-12-25T19:00:00",
+        "category": "Music",
+        "price": 150.0
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = client.post("/api/tickets/sell", json=ticket, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json()["name"] == ticket["name"]
+    assert response.json()["price"] == ticket["price"]
+
+def test_invalid_ticket_sell(client: TestClient):
+    # Step 1: Register a seller
+    seller = {
+        "firstname": "Jozko",
+        "lastname": "Mrkva",
+        "email": "jozko@mrkva.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=seller)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Step 2: Log in as the seller to get a token
+    data = {
+        "grant_type": "password",
+        "username": "jozko@mrkva.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token = response.json()["access_token"]
+
+    # Step 3: Attempt to create an invalid ticket (missing required fields)
+    invalid_ticket = {
+        "description": "VIP Access to the concert",  # Missing name, date, category, and price
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = client.post("/api/tickets/sell", json=invalid_ticket, headers=headers)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
