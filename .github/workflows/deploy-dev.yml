@@ -48,3 +48,26 @@ jobs:
                 echo
                 echo "Building and deploying the project"
                 docker compose -f docker-compose-deploy.yaml up --build -d
+
+
+  test_backend:
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@v1.1.0
+      env:
+        BRANCH: ${{ github.head_ref }}
+        ENV: dev
+      with:
+            host: ${{ secrets.DEV_HOST }}
+            key: ${{ secrets.DEV_SSH_KEY }}
+            username: ${{ secrets.DEV_USERNAME }}
+            script: |
+                docker run \
+                  --network=stuba-asos_default \
+                  -e AUTH_JWT_ALG=HS256 \
+                  -e AUTH_JWT_SECRET=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7 \
+                  -e DB_URL=postgresql://admin:admin@postgres:5432/stubasos \
+                  -e DB_URL_TEST=postgresql://admin:admin@postgres-test:5432/test \
+                  stuba-asos-backend:latest /bin/bash -c "pytest -c src/tests/pytest.ini -vv"

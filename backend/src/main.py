@@ -1,4 +1,3 @@
-# from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from fastapi import APIRouter, FastAPI
