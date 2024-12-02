@@ -23,10 +23,9 @@ def user_create(db: Session, request_user: RequestRegisterUser):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email is already registered"
         )
-    print('user neexistuje')
     db_user = Users(
-        first_name=request_user.firstname,
-        last_name=request_user.lastname,
+        firstname=request_user.firstname,
+        lastname=request_user.lastname,
         email=request_user.email,
         password_hash=password_hash.decode('utf-8')
     )

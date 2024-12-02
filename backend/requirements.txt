@@ -9,3 +9,5 @@ pyjwt
 python-dotenv
 psycopg2-binary
 python-multipart==0.0.12
+pytest
+httpx
