@@ -201,3 +201,155 @@ def test_invalid_ticket_sell(client: TestClient):
     }
     response = client.post("/api/tickets/sell", json=invalid_ticket, headers=headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_valid_ticket_buy(client: TestClient):
+    # Step 1: Register a buyer
+    buyer = {
+        "firstname": "Buyer",
+        "lastname": "Carrot",
+        "email": "buyercarrot@mail.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=buyer)
+    assert response.status_code == status.HTTP_201_CREATED
+    buyer_id = response.json()["id"]
+
+    # Step 2: Log in as the seller to get a token
+    data_buyer = {
+        "grant_type": "password",
+        "username": "buyercarrot@mail.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data_buyer)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token_buyer = response.json()["access_token"]
+
+    # Step 1: Register a seller
+    seller = {
+        "firstname": "Seller",
+        "lastname": "Apple",
+        "email": "sellerapple@mail.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=seller)
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+    # Step 2: Log in as the seller to get a token
+    data_seller = {
+        "grant_type": "password",
+        "username": "sellerapple@mail.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data_seller)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token_seller = response.json()["access_token"]
+
+    ticket = {
+        "name": "Sports Event",
+        "description": "Ticket for front seats",
+        "date": "2024-12-20T20:00:00",
+        "category": "Sports",
+        "price": 200.0
+    }
+    headers = {"Authorization": f"Bearer {token_seller}"}
+    response = client.post("/api/tickets/sell", json=ticket, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+    ticket_id = response.json()["id"]
+
+    # Step 4: Purchase the ticket as the buyer
+    purchase_request = {"id": ticket_id}
+    headers = {"Authorization": f"Bearer {token_buyer}"}
+    response = client.post("/api/tickets/buy", json=purchase_request, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["id"] == ticket_id
+    assert response.json()["buyer_id"] == buyer_id
+
+
+
+def test_already_purchased_ticket_buy(client: TestClient):
+    # Step 1: Register a buyer
+    buyer = {
+        "firstname": "Buyer",
+        "lastname": "Carrot",
+        "email": "buyercarrot@mail.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=buyer)
+    assert response.status_code == status.HTTP_201_CREATED
+    buyer_id = response.json()["id"]
+
+    # Step 2: Log in as the seller to get a token
+    data_buyer = {
+        "grant_type": "password",
+        "username": "buyercarrot@mail.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data_buyer)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token_buyer = response.json()["access_token"]
+
+    # Step 1: Register a seller
+    seller = {
+        "firstname": "Seller",
+        "lastname": "Apple",
+        "email": "sellerapple@mail.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=seller)
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+    # Step 2: Log in as the seller to get a token
+    data_seller = {
+        "grant_type": "password",
+        "username": "sellerapple@mail.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data_seller)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token_seller = response.json()["access_token"]
+
+    ticket = {
+        "name": "Sports Event",
+        "description": "Ticket for front seats",
+        "date": "2024-12-20T20:00:00",
+        "category": "Sports",
+        "price": 200.0
+    }
+    headers = {"Authorization": f"Bearer {token_seller}"}
+    response = client.post("/api/tickets/sell", json=ticket, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+    ticket_id = response.json()["id"]
+
+    # Step 4: Purchase the ticket as the buyer
+    purchase_request = {"id": ticket_id}
+    headers = {"Authorization": f"Bearer {token_buyer}"}
+    response = client.post("/api/tickets/buy", json=purchase_request, headers=headers)
+    # Step 5: try to purchase ticket again
+    purchase_request = {"id": ticket_id}
+    headers = {"Authorization": f"Bearer {token_buyer}"}
+    response = client.post("/api/tickets/buy", json=purchase_request, headers=headers)
+
+    assert response.status_code == status.HTTP_409_CONFLICT
+    assert response.json()["detail"] == "Ticket was already bought"
+
+
+
