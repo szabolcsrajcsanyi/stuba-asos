@@ -8,7 +8,7 @@ from src.database.db import get_db
 from src.users.service import (
     users_get_all,
     user_create,
-    user_delete
+    user_delete,
 )
 
 from src.auth.dependencies import get_current_active_user

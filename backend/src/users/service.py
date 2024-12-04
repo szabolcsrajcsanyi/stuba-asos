@@ -10,7 +10,6 @@ from src.users.schemas import RequestRegisterUser, UserInDB, User
 def users_get_all(db: Session):
     return db.query(Users).all()
 
-
 def user_create(db: Session, request_user: RequestRegisterUser):
     salt = bcrypt.gensalt()
     password_hash = bcrypt.hashpw(request_user.password.encode('utf-8'), salt)

@@ -66,3 +66,7 @@ def ticket_buy(db: Session, request_ticket: TicketToPurchase, buyer_id: str):
         seller_id=ticket.seller_id,
         buyer_id=ticket.buyer_id
     )
+
+
+def tickets_get_all(db: Session):
+    return db.query(Ticket).all()
