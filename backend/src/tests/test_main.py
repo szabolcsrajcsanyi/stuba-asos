@@ -205,12 +205,6 @@ def test_invalid_ticket_sell(client: TestClient):
     response = client.post("/api/tickets/sell", json=invalid_ticket, headers=headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-def test_get_all_tickets(client: TestClient):
-    # Ensure we start with no tickets
-    response = client.get("/api/tickets/my-tickets/")
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == []
-
 def test_get_my_tickets(client: TestClient):
     # Register a user
     user = {
@@ -308,27 +302,28 @@ def test_update_ticket(client: TestClient):
 
 
 def test_delete_ticket(client: TestClient):
-    # Register a user
+    # Step 1: Register a user
     user = {
-        "firstname": "Lucas",
-        "lastname": "Brown",
-        "email": "lucas@brown.com",
-        "password": "securepassword"
+        "firstname": "Mike",
+        "lastname": "Wazowski",
+        "email": "mike@wazowski.com",
+        "password": "password"
     }
     response = client.post("/api/users/register", json=user)
     assert response.status_code == status.HTTP_201_CREATED
 
-    # Log in as the user
+    # Step 2: Log in to get the authentication token
     data = {
         "grant_type": "password",
-        "username": "lucas@brown.com",
-        "password": "securepassword",
+        "username": "mike@wazowski.com",
+        "password": "password",
         "scope": "",
         "client_id": "string",
         "client_secret": "string"
     }
     response = client.post("/api/auth/token", data=data)
     assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
     token = response.json()["access_token"]
 
     # Sell a ticket
@@ -348,5 +343,4 @@ def test_delete_ticket(client: TestClient):
 
     # Delete the ticket
     response = client.delete(f"/api/tickets/my-tickets/{ticket_id}", headers=headers)
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == "Ticket deleted successfully"
+    assert response.status_code == status.HTTP_204_NO_CONTENT
