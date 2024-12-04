@@ -35,6 +35,10 @@ def test_get_all_users(client: TestClient):
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == []
 
+def test_get_all_tickets(client: TestClient):
+    response = client.get("/api/tickets/alltickets")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == []
 
 def test_login_user(client: TestClient):
     user = {
@@ -71,7 +75,6 @@ def test_login_incorrect_user(client: TestClient):
     response = client.post("/api/auth/token", data=data)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json() == {"detail": "Incorrect username or password"}
-
 
 def test_delete_user(client: TestClient):
     # Step 1: Register a user

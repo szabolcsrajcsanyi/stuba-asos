@@ -4,12 +4,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from src.database.models import Users, Ticket
-from src.users.schemas import RequestRegisterUser, UserInDB, User, TicketToPurchase
+from src.users.schemas import RequestRegisterUser, UserInDB, User
 
 
 def users_get_all(db: Session):
     return db.query(Users).all()
-
 
 def user_create(db: Session, request_user: RequestRegisterUser):
     salt = bcrypt.gensalt()
@@ -74,14 +73,3 @@ def get_user_by_email(db: Session, email: str):
             hashed_password=user.password_hash
         )
     return None
-
-def ticket_buy(db: Session, request_ticket: TicketToPurchase, current_user:User):
-    ticket = db.query(Ticket).filter(Ticket.id == request_ticket.id).first()
-    if ticket:
-        if ticket.buyer_id:
-            return {"error": "Ticket is already purchased"}
-        ticket.buyer_id = current_user.id
-        db.commit()
-        db.refresh(ticket)
-
-    return {"message": "Ticket successfully purchased", "ticket_id": ticket.id}

@@ -36,3 +36,6 @@ def ticket_create(db: Session, request_ticket: RequestSellTicket, seller_id: str
         price=db_ticket.price,
         seller_id=db_ticket.seller_id
     )
+
+def tickets_get_all(db: Session):
+    return db.query(Ticket).all()
