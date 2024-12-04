@@ -37,6 +37,9 @@ def ticket_create(db: Session, request_ticket: RequestSellTicket, seller_id: str
         seller_id=db_ticket.seller_id
     )
 
+def tickets_get_all(db: Session):
+    return db.query(Ticket).all()
+
 def my_tickets(db: Session, seller_id: str):
     tickets = db.query(Ticket).filter(Ticket.seller_id == seller_id).all()
     if not tickets:

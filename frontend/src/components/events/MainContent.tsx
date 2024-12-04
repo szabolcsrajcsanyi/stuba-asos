@@ -16,63 +16,11 @@ import { styled } from '@mui/material/styles';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import RssFeedRoundedIcon from '@mui/icons-material/RssFeedRounded';
 import Button from "@mui/material/Button";
-
-const cardData = [
-  {
-    img: 'https://picsum.photos/800/450?random=1',
-    tag: 'Engineering',
-    title: 'Revolutionizing software development with cutting-edge tools',
-    description:
-      'Our latest engineering tools are designed to streamline workflows and boost productivity. Discover how these innovations are transforming the software development landscape.',
-    authors: [
-      { name: 'Remy Sharp', avatar: '/static/images/avatar/1.jpg' },
-      { name: 'Travis Howard', avatar: '/static/images/avatar/2.jpg' },
-    ],
-  },
-  {
-    img: 'https://picsum.photos/800/450?random=2',
-    tag: 'Product',
-    title: 'Innovative product features that drive success',
-    description:
-      'Explore the key features of our latest product release that are helping businesses achieve their goals. From user-friendly interfaces to robust functionality, learn why our product stands out.',
-    authors: [{ name: 'Erica Johns', avatar: '/static/images/avatar/6.jpg' }],
-  },
-  {
-    img: 'https://picsum.photos/800/450?random=3',
-    tag: 'Design',
-    title: 'Designing for the future: trends and insights',
-    description:
-      'Stay ahead of the curve with the latest design trends and insights. Our design team shares their expertise on creating intuitive and visually stunning user experiences.',
-    authors: [{ name: 'Kate Morrison', avatar: '/static/images/avatar/7.jpg' }],
-  },
-  {
-    img: 'https://picsum.photos/800/450?random=4',
-    tag: 'Company',
-    title: "Our company's journey: milestones and achievements",
-    description:
-      "Take a look at our company's journey and the milestones we've achieved along the way. From humble beginnings to industry leader, discover our story of growth and success.",
-    authors: [{ name: 'Cindy Baker', avatar: '/static/images/avatar/3.jpg' }],
-  },
-  {
-    img: 'https://picsum.photos/800/450?random=45',
-    tag: 'Engineering',
-    title: 'Pioneering sustainable engineering solutions',
-    description:
-      "Learn about our commitment to sustainability and the innovative engineering solutions we're implementing to create a greener future. Discover the impact of our eco-friendly initiatives.",
-    authors: [
-      { name: 'Agnes Walker', avatar: '/static/images/avatar/4.jpg' },
-      { name: 'Trevor Henderson', avatar: '/static/images/avatar/5.jpg' },
-    ],
-  },
-  {
-    img: 'https://picsum.photos/800/450?random=6',
-    tag: 'Product',
-    title: 'Maximizing efficiency with our latest product updates',
-    description:
-      'Our recent product updates are designed to help you maximize efficiency and achieve more. Get a detailed overview of the new features and improvements that can elevate your workflow.',
-    authors: [{ name: 'Travis Howard', avatar: '/static/images/avatar/2.jpg' }],
-  },
-];
+import {useState, useEffect} from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 
 const SyledCard = styled(Card)(({ theme }) => ({
   display: 'flex',
@@ -110,6 +58,26 @@ const StyledTypography = styled(Typography)({
   textOverflow: 'ellipsis',
 });
 
+const StyledDialogActions = styled(DialogActions)({
+    display: "flex",
+    justifyContent: "center",
+})
+
+interface Ticket {
+  id: string;
+  name: string;
+  description?: string;
+  date: string;
+  category: string;
+  price: number;
+  buyer_id?: number;
+  seller_id: number;
+}
+
+interface SearchProps {
+  onSearch: (query: string) => void;
+}
+
 function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
   return (
     <Box
@@ -144,24 +112,46 @@ function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
   );
 }
 
-export function Search() {
+export function Search({ onSearch }: SearchProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    onSearch(searchQuery);
+  };
+
   return (
-    <FormControl sx={{ width: { xs: '100%', md: '25ch' } }} variant="outlined">
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        width: { xs: '100%', md: '25ch' },
+        gap: 1,
+      }}
+    >
       <OutlinedInput
         size="small"
         id="search"
         placeholder="Search…"
-        sx={{ flexGrow: 1 }}
-        startAdornment={
-          <InputAdornment position="start" sx={{ color: 'text.primary' }}>
-            <SearchRoundedIcon fontSize="small" />
-          </InputAdornment>
-        }
+        sx={{
+          flex: 1,
+        }}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         inputProps={{
           'aria-label': 'search',
         }}
       />
-    </FormControl>
+      <IconButton
+        size="medium"
+        aria-label="search"
+        onClick={handleSearch}
+        sx={{
+          flexShrink: 0,
+        }}
+      >
+        <SearchRoundedIcon />
+      </IconButton>
+    </Box>
   );
 }
 
@@ -169,6 +159,13 @@ export default function MainContent() {
   const [focusedCardIndex, setFocusedCardIndex] = React.useState<number | null>(
     null,
   );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
 
   const handleFocus = (index: number) => {
     setFocusedCardIndex(index);
@@ -178,12 +175,108 @@ export default function MainContent() {
     setFocusedCardIndex(null);
   };
 
-  const handleClick = () => {
-    console.info('You clicked the filter chip.');
+  // const handleClick = () => {
+  //   console.info('You clicked the filter chip.');
+  // };
+  const handleBuyClick = async (ticketId:string) => {
+    console.log(`Confirming to buy ticket`);
+    setSelectedTicketId(ticketId);
+    setIsDialogOpen(true);
   };
-    const handleBuyClick = (ticketId:string) => {
-    console.log(`Buying ticket with ID: ${ticketId}`);
-    // Add actual buy logic here
+  const handleDialogClose = async (confirm: boolean) => {
+    if (confirm && selectedTicketId) {
+      console.log(`Buying ticket with ID: ${selectedTicketId}`);
+      // Call your ticket purchase function here
+      // purchaseTicket(selectedTicketId);
+      const payload = {
+        id: selectedTicketId || ''
+      };
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
+      try {
+        const response = await fetch(`http://${backendUrl}/api/tickets/buy`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        const responseData = await response.json();
+        if (!response.ok) {
+          console.log(responseData)
+        }
+        return;
+      }
+      catch (error) {
+        console.error('There was an error!', error);
+      }
+    }
+    setIsDialogOpen(false);
+    setSelectedTicketId(null);
+
+  };
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
+      try {
+        const response = await fetch(`http://${backendUrl}/api/tickets/alltickets`); // Adjust the API endpoint as needed
+        if (response.ok) {
+          const data: Ticket[] = await response.json();
+          setTickets(data);
+          setFilteredTickets(data);
+
+
+          const uniqueCategories = Array.from(new Set(data.map(ticket => ticket.category)));
+          setCategories(uniqueCategories);
+
+          console.log(tickets)
+        } else {
+          console.error('Failed to fetch tickets');
+        }
+      } catch (error) {
+        console.error('Error fetching tickets:', error);
+      }
+    };
+
+    fetchTickets();
+  }, []);
+
+  // Handle category selection and filtering
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    console.info(category)
+    if (category === '' || category === 'all') {
+      setFilteredTickets(tickets);
+    } else {
+      setFilteredTickets(tickets.filter(ticket => ticket.category === category));
+    }
+  };
+
+
+  const handleTicketClick = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+  };
+
+
+  const handleCloseModal = () => {
+    setSelectedTicket(null);
+  };
+
+  // Handle the search functionality
+  const handleSearch = (query: string) => {
+    if (!query) {
+      setFilteredTickets(tickets);
+      return;
+    }
+
+    const lowerCaseQuery = query.toLowerCase();
+    const filtered = tickets.filter(
+      (ticket) =>
+        ticket.name.toLowerCase().includes(lowerCaseQuery) ||
+        (ticket.description && ticket.description.toLowerCase().includes(lowerCaseQuery))
+    );
+    setFilteredTickets(filtered);
   };
 
   return (
@@ -203,10 +296,6 @@ export default function MainContent() {
           overflow: 'auto',
         }}
       >
-        <Search />
-        <IconButton size="small" aria-label="RSS feed">
-          <RssFeedRoundedIcon />
-        </IconButton>
       </Box>
       <Box
         sx={{
@@ -227,43 +316,34 @@ export default function MainContent() {
             overflow: 'auto',
           }}
         >
-          <Chip onClick={handleClick} size="medium" label="All categories" />
-          <Chip
-            onClick={handleClick}
+          <Box sx={{ display: 'flex', overflowX: 'auto', mb: 2 }}>
+            <Chip
+            key="all"
+            label="All Tickets"
             size="medium"
-            label="Company"
+            onClick={() => handleCategoryClick("all")}
             sx={{
-              backgroundColor: 'transparent',
+              marginRight: 1,
+              backgroundColor: selectedCategory === "all" ? 'lightblue' : 'transparent',
               border: 'none',
+              cursor: 'pointer',
             }}
           />
+        {categories.map((category) => (
           <Chip
-            onClick={handleClick}
+            key={category}
+            label={category}
             size="medium"
-            label="Product"
+            onClick={() => handleCategoryClick(category)}
             sx={{
-              backgroundColor: 'transparent',
+              marginRight: 1,
+              backgroundColor: selectedCategory === category ? 'lightblue' : 'transparent',
               border: 'none',
+              cursor: 'pointer',
             }}
           />
-          <Chip
-            onClick={handleClick}
-            size="medium"
-            label="Design"
-            sx={{
-              backgroundColor: 'transparent',
-              border: 'none',
-            }}
-          />
-          <Chip
-            onClick={handleClick}
-            size="medium"
-            label="Engineering"
-            sx={{
-              backgroundColor: 'transparent',
-              border: 'none',
-            }}
-          />
+        ))}
+      </Box>
         </Box>
         <Box
           sx={{
@@ -274,224 +354,107 @@ export default function MainContent() {
             overflow: 'auto',
           }}
         >
-          <Search />
-          <IconButton size="small" aria-label="RSS feed">
-            <RssFeedRoundedIcon />
-          </IconButton>
+      <Search onSearch={handleSearch} />
         </Box>
       </Box>
+
+     <Dialog
+        open={isDialogOpen}
+        onClose={() => handleDialogClose(false)}
+        aria-labelledby="confirmation-dialog-title"
+      >
+        <DialogTitle id="confirmation-dialog-title">
+          Do you want to buy this ticket?
+        </DialogTitle>
+        <StyledDialogActions>
+          <Button onClick={() => handleDialogClose(true)} color="primary" autoFocus>
+            Yes
+          </Button>
+          <Button onClick={() => handleDialogClose(false)} color="secondary">
+            No
+          </Button>
+        </StyledDialogActions>
+      </Dialog>
+
       <Grid container spacing={2} columns={12}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        {filteredTickets.map((ticket, index) => (
+        <Grid key={ticket.id} size={{ xs: 12, md: 6 }}>
           <SyledCard
             variant="outlined"
-            onFocus={() => handleFocus(0)}
+            onFocus={() => handleFocus(index)}
             onBlur={handleBlur}
             tabIndex={0}
-            className={focusedCardIndex === 0 ? 'Mui-focused' : ''}
+            className={focusedCardIndex === index ? 'Mui-focused' : ''}
+            onClick={() => handleTicketClick(ticket)} // Open modal on click
           >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[0].img}
-              sx={{
-                aspectRatio: '16 / 9',
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-              }}
-            />
             <SyledCardContent>
               <Typography gutterBottom variant="caption" component="div">
-                {cardData[0].tag}
+                {ticket.category}
               </Typography>
               <Typography gutterBottom variant="h6" component="div">
-                {cardData[0].title}
+                {ticket.name}
               </Typography>
               <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                {cardData[0].description}
+                {ticket.description}
               </StyledTypography>
             </SyledCardContent>
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleBuyClick(cardData[0].title)}
+              onClick={() => handleBuyClick(ticket.id)}
             >
-              Buy ticket test button
+              Buy Ticket
             </Button>
-
-            <Author authors={cardData[0].authors} />
           </SyledCard>
         </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(1)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 1 ? 'Mui-focused' : ''}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[1].img}
-              aspect-ratio="16 / 9"
-              sx={{
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[1].tag}
-              </Typography>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[1].title}
-              </Typography>
-              <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                {cardData[1].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authors={cardData[1].authors} />
-          </SyledCard>
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(2)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 2 ? 'Mui-focused' : ''}
-            sx={{ height: '100%' }}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[2].img}
-              sx={{
-                height: { sm: 'auto', md: '50%' },
-                aspectRatio: { sm: '16 / 9', md: '' },
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[2].tag}
-              </Typography>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[2].title}
-              </Typography>
-              <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                {cardData[2].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authors={cardData[2].authors} />
-          </SyledCard>
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Box
-            sx={{ display: 'flex', flexDirection: 'column', gap: 2, height: '100%' }}
-          >
-            <SyledCard
-              variant="outlined"
-              onFocus={() => handleFocus(3)}
-              onBlur={handleBlur}
-              tabIndex={0}
-              className={focusedCardIndex === 3 ? 'Mui-focused' : ''}
-              sx={{ height: '100%' }}
-            >
-              <SyledCardContent
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                }}
-              >
-                <div>
-                  <Typography gutterBottom variant="caption" component="div">
-                    {cardData[3].tag}
-                  </Typography>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {cardData[3].title}
-                  </Typography>
-                  <StyledTypography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {cardData[3].description}
-                  </StyledTypography>
-                </div>
-              </SyledCardContent>
-              <Author authors={cardData[3].authors} />
-            </SyledCard>
-            <SyledCard
-              variant="outlined"
-              onFocus={() => handleFocus(4)}
-              onBlur={handleBlur}
-              tabIndex={0}
-              className={focusedCardIndex === 4 ? 'Mui-focused' : ''}
-              sx={{ height: '100%' }}
-            >
-              <SyledCardContent
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                }}
-              >
-                <div>
-                  <Typography gutterBottom variant="caption" component="div">
-                    {cardData[4].tag}
-                  </Typography>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {cardData[4].title}
-                  </Typography>
-                  <StyledTypography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    {cardData[4].description}
-                  </StyledTypography>
-                </div>
-              </SyledCardContent>
-              <Author authors={cardData[4].authors} />
-            </SyledCard>
-          </Box>
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <SyledCard
-            variant="outlined"
-            onFocus={() => handleFocus(5)}
-            onBlur={handleBlur}
-            tabIndex={0}
-            className={focusedCardIndex === 5 ? 'Mui-focused' : ''}
-            sx={{ height: '100%' }}
-          >
-            <CardMedia
-              component="img"
-              alt="green iguana"
-              image={cardData[5].img}
-              sx={{
-                height: { sm: 'auto', md: '50%' },
-                aspectRatio: { sm: '16 / 9', md: '' },
-              }}
-            />
-            <SyledCardContent>
-              <Typography gutterBottom variant="caption" component="div">
-                {cardData[5].tag}
-              </Typography>
-              <Typography gutterBottom variant="h6" component="div">
-                {cardData[5].title}
-              </Typography>
-              <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                {cardData[5].description}
-              </StyledTypography>
-            </SyledCardContent>
-            <Author authors={cardData[5].authors} />
-          </SyledCard>
-        </Grid>
+      ))}
       </Grid>
+
+      {selectedTicket && (
+        <Dialog
+          open={Boolean(selectedTicket)}
+          onClose={handleCloseModal}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.8rem', textAlign: 'center'}}>{selectedTicket.name}</DialogTitle>
+<DialogContent>
+  <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>Category: {selectedTicket.category}</Typography>
+
+  <Typography
+    variant="body1"
+    sx={{ marginTop: 2, fontSize: '1rem', marginBottom: 2 }}
+    gutterBottom
+  >
+    {selectedTicket.description}
+  </Typography>
+
+  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Typography
+      variant="h5"
+      sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}
+      gutterBottom
+    >
+      Price: ${selectedTicket.price}
+    </Typography>
+
+    <Typography
+      variant="h5"
+      sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}
+      gutterBottom
+    >
+      Date: {new Date(selectedTicket.date).toLocaleDateString()}
+    </Typography>
+  </Box>
+</DialogContent>
+
+          <DialogActions>
+            <Button onClick={handleCloseModal} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   );
 }

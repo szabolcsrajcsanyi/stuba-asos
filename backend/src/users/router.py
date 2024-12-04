@@ -8,7 +8,7 @@ from src.database.db import get_db
 from src.users.service import (
     users_get_all,
     user_create,
-    user_delete
+    user_delete,
 )
 
 from src.auth.dependencies import get_current_active_user
@@ -28,8 +28,5 @@ def create_user(request_user: RequestRegisterUser, db: Session = Depends(get_db)
 
 
 @router.delete("/me", status_code=status.HTTP_200_OK)
-def delete_user(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-    db: Session = Depends(get_db),
-):
+def delete_user(current_user: Annotated[User, Depends(get_current_active_user)],db: Session = Depends(get_db),):
     return user_delete(db=db, current_user=current_user)
