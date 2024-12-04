@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -28,3 +29,8 @@ class User(BaseModel):
 
 class UserInDB(User):
     hashed_password: str
+
+class TicketToPurchase(BaseModel):
+    id: int
+    class Config:
+        from_attributes = True

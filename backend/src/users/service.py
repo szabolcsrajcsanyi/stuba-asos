@@ -3,13 +3,12 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from src.database.models import Users
+from src.database.models import Users, Ticket
 from src.users.schemas import RequestRegisterUser, UserInDB, User
 
 
 def users_get_all(db: Session):
     return db.query(Users).all()
-
 
 def user_create(db: Session, request_user: RequestRegisterUser):
     salt = bcrypt.gensalt()
@@ -74,4 +73,3 @@ def get_user_by_email(db: Session, email: str):
             hashed_password=user.password_hash
         )
     return None
-
