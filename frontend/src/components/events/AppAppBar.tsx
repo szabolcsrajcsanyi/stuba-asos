@@ -94,7 +94,7 @@ export default function AppAppBar() {
               <Button variant="text" color="info" size="small">
                 Buy tickets
               </Button>
-              <Button variant="text" color="info" size="small">
+              <Button variant="text" color="info" size="small" onClick={() => navigate('/tickets/sell')}>
                 Sell tickets
               </Button>
               <Button variant="text" color="info" size="small">

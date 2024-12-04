@@ -23,10 +23,9 @@ def user_create(db: Session, request_user: RequestRegisterUser):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email is already registered"
         )
-    print('user neexistuje')
     db_user = Users(
-        first_name=request_user.firstname,
-        last_name=request_user.lastname,
+        firstname=request_user.firstname,
+        lastname=request_user.lastname,
         email=request_user.email,
         password_hash=password_hash.decode('utf-8')
     )
@@ -44,8 +43,8 @@ def user_create(db: Session, request_user: RequestRegisterUser):
 
     return User(
         id=db_user.id,
-        firstname=db_user.first_name,
-        lastname=db_user.last_name,
+        firstname=db_user.firstname,
+        lastname=db_user.lastname,
         email=db_user.email,
         disabled=db_user.disabled
     )
@@ -68,8 +67,8 @@ def get_user_by_email(db: Session, email: str):
     if user:
         return UserInDB(
             id=user.id,
-            firstname=user.first_name,
-            lastname=user.last_name,
+            firstname=user.firstname,
+            lastname=user.lastname,
             email=user.email,
             disabled=user.disabled,
             hashed_password=user.password_hash
