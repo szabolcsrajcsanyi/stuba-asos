@@ -70,3 +70,44 @@ def ticket_buy(db: Session, request_ticket: TicketToPurchase, buyer_id: str):
 
 def tickets_get_all(db: Session):
     return db.query(Ticket).all()
+
+def my_tickets(db: Session, seller_id: str):
+    tickets = db.query(Ticket).filter(Ticket.seller_id == seller_id).all()
+    if not tickets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No tickets found for the current user.",
+        )
+
+    return [TicketResponse.model_validate(ticket) for ticket in tickets]
+
+
+def update_ticket(db: Session, ticket_id: str, request_ticket: RequestSellTicket, current_user):
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id, Ticket.seller_id == current_user.id).first()
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ticket not found or you do not have permission to update it.",
+        )
+
+    ticket.name = request_ticket.name
+    ticket.description = request_ticket.description
+    ticket.date = request_ticket.date
+    ticket.category = request_ticket.category
+    ticket.price = request_ticket.price
+
+    db.commit()
+    db.refresh(ticket)
+    return TicketResponse.model_validate(ticket)
+
+
+def delete_ticket(db: Session, ticket_id: str, current_user):
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id, Ticket.seller_id == current_user.id).first()
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ticket not found or you do not have permission to delete it.",
+        )
+
+    db.delete(ticket)
+    db.commit()

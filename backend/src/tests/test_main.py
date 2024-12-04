@@ -356,3 +356,143 @@ def test_already_purchased_ticket_buy(client: TestClient):
 
 
 
+
+def test_get_my_tickets(client: TestClient):
+    # Register a user
+    user = {
+        "firstname": "John",
+        "lastname": "Doe",
+        "email": "john@doe.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=user)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Log in as the user
+    data = {
+        "grant_type": "password",
+        "username": "john@doe.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data)
+    assert response.status_code == status.HTTP_200_OK
+    token = response.json()["access_token"]
+
+    # Sell a ticket
+    ticket = {
+        "name": "Sports Event",
+        "description": "Front-row seats to the game",
+        "date": "2024-12-20T15:00:00",
+        "category": "Sports",
+        "price": 200.0
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = client.post("/api/tickets/sell", json=ticket, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Fetch user's tickets
+    response = client.get("/api/tickets/my-tickets", headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == 1
+    assert response.json()[0]["name"] == ticket["name"]
+
+def test_update_ticket(client: TestClient):
+    # Register a user
+    user = {
+        "firstname": "Anna",
+        "lastname": "Smith",
+        "email": "anna@smith.com",
+        "password": "securepassword"
+    }
+    response = client.post("/api/users/register", json=user)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Log in as the user
+    data = {
+        "grant_type": "password",
+        "username": "anna@smith.com",
+        "password": "securepassword",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data)
+    assert response.status_code == status.HTTP_200_OK
+    token = response.json()["access_token"]
+
+    # Sell a ticket
+    ticket = {
+        "name": "Theater Play",
+        "description": "Drama and suspense",
+        "date": "2024-12-30T19:00:00",
+        "category": "Theater",
+        "price": 50.0
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = client.post("/api/tickets/sell", json=ticket, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+    ticket_id = response.json()["id"]
+
+    # Update the ticket
+    updated_ticket = {
+        "name": "Updated Theater Play",
+        "description": "Updated description",
+        "date": "2024-12-31T19:00:00",
+        "category": "Updated Category",
+        "price": 75.0
+    }
+    response = client.put(f"/api/tickets/my-tickets/{ticket_id}", json=updated_ticket, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["name"] == updated_ticket["name"]
+
+
+def test_delete_ticket(client: TestClient):
+    # Step 1: Register a user
+    user = {
+        "firstname": "Mike",
+        "lastname": "Wazowski",
+        "email": "mike@wazowski.com",
+        "password": "password"
+    }
+    response = client.post("/api/users/register", json=user)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Step 2: Log in to get the authentication token
+    data = {
+        "grant_type": "password",
+        "username": "mike@wazowski.com",
+        "password": "password",
+        "scope": "",
+        "client_id": "string",
+        "client_secret": "string"
+    }
+    response = client.post("/api/auth/token", data=data)
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    token = response.json()["access_token"]
+
+    # Sell a ticket
+    ticket = {
+        "name": "Movie Ticket",
+        "description": "Premiere night",
+        "date": "2024-12-15T21:00:00",
+        "category": "Movies",
+        "price": 20.0
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = client.post("/api/tickets/sell", json=ticket, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+    ticket_id = response.json()["id"]
+
+    # Delete the ticket
+    response = client.delete(f"/api/tickets/my-tickets/{ticket_id}", headers=headers)
+    assert response.status_code == status.HTTP_204_NO_CONTENT
