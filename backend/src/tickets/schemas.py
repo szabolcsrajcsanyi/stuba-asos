@@ -26,3 +26,9 @@ class TicketResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class TicketToPurchase(BaseModel):
+    id: UUID
+
+    class Config:
+        from_attributes = True

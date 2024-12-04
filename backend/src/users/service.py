@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from src.database.models import Users, Ticket
+from src.database.models import Users
 from src.users.schemas import RequestRegisterUser, UserInDB, User
 
 
@@ -73,3 +73,4 @@ def get_user_by_email(db: Session, email: str):
             hashed_password=user.password_hash
         )
     return None
+
