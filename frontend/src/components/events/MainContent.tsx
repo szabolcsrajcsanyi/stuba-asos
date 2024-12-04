@@ -205,7 +205,6 @@ export default function MainContent() {
         if (!response.ok) {
           console.log(responseData)
         }
-        return;
       }
       catch (error) {
         console.error('There was an error!', error);
@@ -213,19 +212,21 @@ export default function MainContent() {
     }
     setIsDialogOpen(false);
     setSelectedTicketId(null);
+    setSelectedTicket(null);
 
   };
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchTickets = async () => {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || "localhost:8502";
       try {
         const response = await fetch(`http://${backendUrl}/api/tickets/alltickets`); // Adjust the API endpoint as needed
         if (response.ok) {
           const data: Ticket[] = await response.json();
-          setTickets(data);
-          setFilteredTickets(data);
+          const availabletickets= data.filter(ticket => ticket.buyer_id === null)
 
+          setTickets(availabletickets);
+          setFilteredTickets(availabletickets);
 
           const uniqueCategories = Array.from(new Set(data.map(ticket => ticket.category)));
           setCategories(uniqueCategories);
@@ -358,23 +359,23 @@ export default function MainContent() {
         </Box>
       </Box>
 
-     <Dialog
-        open={isDialogOpen}
-        onClose={() => handleDialogClose(false)}
-        aria-labelledby="confirmation-dialog-title"
-      >
-        <DialogTitle id="confirmation-dialog-title">
-          Do you want to buy this ticket?
-        </DialogTitle>
-        <StyledDialogActions>
-          <Button onClick={() => handleDialogClose(true)} color="primary" autoFocus>
-            Yes
-          </Button>
-          <Button onClick={() => handleDialogClose(false)} color="secondary">
-            No
-          </Button>
-        </StyledDialogActions>
-      </Dialog>
+     {/*<Dialog*/}
+     {/*   open={isDialogOpen}*/}
+     {/*   onClose={() => handleDialogClose(false)}*/}
+     {/*   aria-labelledby="confirmation-dialog-title"*/}
+     {/* >*/}
+     {/*   <DialogTitle id="confirmation-dialog-title">*/}
+     {/*     Do you want to buy this ticket?*/}
+     {/*   </DialogTitle>*/}
+     {/*   <StyledDialogActions>*/}
+     {/*     <Button onClick={() => handleDialogClose(true)} color="primary" autoFocus>*/}
+     {/*       Yes*/}
+     {/*     </Button>*/}
+     {/*     <Button onClick={() => handleDialogClose(false)} color="secondary">*/}
+     {/*       No*/}
+     {/*     </Button>*/}
+     {/*   </StyledDialogActions>*/}
+     {/* </Dialog>*/}
 
       <Grid container spacing={2} columns={12}>
         {filteredTickets.map((ticket, index) => (
@@ -448,11 +449,17 @@ export default function MainContent() {
   </Box>
 </DialogContent>
 
-          <DialogActions>
-            <Button onClick={handleCloseModal} color="primary">
-              Close
-            </Button>
-          </DialogActions>
+          <StyledDialogActions>
+              <Button onClick={() => handleDialogClose(true)} color="primary" autoFocus>
+                Buy ticket
+              </Button>
+              <Button onClick={() => handleDialogClose(false)} color="secondary">
+                cancel
+              </Button>
+            {/*<Button onClick={handleCloseModal} color="primary">*/}
+            {/*  Close*/}
+            {/*</Button>*/}
+          </StyledDialogActions>
         </Dialog>
       )}
     </Box>
