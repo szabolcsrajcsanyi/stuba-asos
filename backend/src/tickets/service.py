@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError
 
 from src.database.models import Ticket
 from src.tickets.schemas import RequestSellTicket, TicketResponse
-from typing import List
 
 def ticket_create(db: Session, request_ticket: RequestSellTicket, seller_id: str):
 
