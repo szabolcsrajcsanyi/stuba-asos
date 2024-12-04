@@ -451,10 +451,10 @@ export default function MainContent() {
 
           <StyledDialogActions>
               <Button onClick={() => handleDialogClose(true)} color="primary" autoFocus>
-                Yes
+                Buy ticket
               </Button>
               <Button onClick={() => handleDialogClose(false)} color="secondary">
-                No
+                cancel
               </Button>
             {/*<Button onClick={handleCloseModal} color="primary">*/}
             {/*  Close*/}
